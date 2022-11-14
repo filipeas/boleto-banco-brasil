@@ -2,7 +2,7 @@
 <h3 align="center">Gere boletos de forma mais fácil com esse SDK, controlando sempre<br> o último boleto gerado de forma simples.</h3>
 <p align="center">
         <a href="https://github.com/filipeas/boleto-banco-brasil/releases/tag/0.1.0" alt="Version">
-        <img src="https://img.shields.io/badge/version-0.1.0-green" /></a>
+        <img src="https://img.shields.io/badge/version-0.0.6-green" /></a>
 </p>
 
 ## Configuração
