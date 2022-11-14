@@ -1,0 +1,23 @@
+name: Publicação do pacote - BOLETO_BANCO_BRASIL
+on:
+  push:
+        branches: #pull_request
+            - master
+        # types: [closed]
+jobs:
+  npm-publish:
+    name: npm-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 10.0.0
+          registry-url: 'https://registry.npmjs.org/'
+      - run: npm install
+      - run: npm publish --access public
+        env:
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
