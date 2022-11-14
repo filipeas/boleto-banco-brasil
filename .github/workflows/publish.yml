@@ -26,15 +26,9 @@ jobs:
       - name: Build package
         run: yarn build
       
-    environment:
-      name: NPM
-      url: https://www.npmjs.com/package/boleto-banco-brasil
-  
-    name: 🎉 NPM Publish
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout repository
         uses: actions/checkout@master
+        
       - name: Set up Node.js
         uses: actions/setup-node@master
         with:
@@ -45,3 +39,7 @@ jobs:
         env:
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+    environment:
+      name: NPM
+      url: https://www.npmjs.com/package/boleto-banco-brasil
