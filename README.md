@@ -60,3 +60,8 @@ Para verificar a execução do SDK, execute:
 2) Execute ``` yarn build ``` para buildar o projeto para javascript.
 3) Execute ``` node dist/test/create-boleto.js ``` para criar um boleto de teste.
 4) Execute ``` node dist/test/find-last-boleto.js ``` para visualizar o último boleto.
+
+## Melhorias pendentes
+    [ ] remover .env do projeto e fazer o usuario passar informacoes por parametro
+    [ ] remover testes funcionais, pois eles so funcionam se for colocado a autenticacao no .env
+    [ ] implementar testes unitários
