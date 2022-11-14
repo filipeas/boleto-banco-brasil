@@ -1,4 +1,4 @@
-import { IBoletoRepository, ICreateBoleto } from "@application/repositories/boleto/boleto.repository";
+import { IBoletoRepository } from "@application/repositories/boleto/boleto.repository";
 import { Either, left, right } from "@core/logic/either";
 import { IBoleto } from "@domain/boleto/dto/boleto.dto";
 import { Boleto } from "@domain/boleto/entities/boleto";
@@ -102,13 +102,10 @@ export class CreateBoleto {
       estadoComprador,
       numeroBoleto,
       total,
-    })
-    if (!data) {
-      return left(new NotFoundError("Boleto não encontrado"));
-    }
+    });
 
     // generate PDF
-    const linkBoleto = generateBoleto({
+    const linkBoleto = await generateBoleto({
       environment,
       agencia: BB_AGENCIA,
       conta: BB_CONTA,
