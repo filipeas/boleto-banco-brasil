@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { BoletoRepository } from "@infra/repositories/boleto/boleto.repository";
 import { CreateBoleto } from '@application/usecases/boleto/create-boleto';
 import { IEnvironment } from '@core/dto/environment';
+import { FindLastBoleto } from '@application/usecases/boleto/find-last-boleto';
 
 export async function createBoleto(
   environment: IEnvironment,
@@ -49,6 +50,31 @@ export async function createBoleto(
       estadoComprador,
       nomeComprador,
       total,
+    });
+
+  return result;
+}
+
+export async function findLastBoleto(
+  BB_AGENCIA: string,
+  BB_API_KEY: string,
+  BB_BASIC_CREDENTIALS: string,
+  BB_CONTA: string,
+  BB_OAUTH_URL: string,
+  BB_API_URL: string,
+  BB_APP_KEY: string,
+) {
+  const boletoRepository = new BoletoRepository();
+  const findLastBoleto = new FindLastBoleto(boletoRepository);
+  const result = findLastBoleto.run(
+    {
+      BB_AGENCIA,
+      BB_API_KEY,
+      BB_BASIC_CREDENTIALS,
+      BB_CONTA,
+      BB_OAUTH_URL,
+      BB_API_URL,
+      BB_APP_KEY,
     });
 
   return result;
