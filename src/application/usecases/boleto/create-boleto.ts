@@ -6,9 +6,6 @@ import { BoletoMapper } from "@domain/boleto/mappers/boleto.mapper";
 import { NotFoundError } from "@errors/not-found.error";
 import { inject, injectable } from "tsyringe";
 import crypto from 'crypto';
-import { generateBoleto } from "@infra/utils/generate-boleto";
-import { formatDate } from "@infra/utils/format-date";
-import { addDays } from "date-fns";
 import { IEnvironment } from "@core/dto/environment";
 
 type IRequest = {
@@ -85,8 +82,11 @@ export class CreateBoleto {
     }
 
     const data = await this.boletoRepository.createBoleto({
+      environment,
       BB_API_KEY,
       BB_BASIC_CREDENTIALS,
+      BB_AGENCIA,
+      BB_CONTA,
       BB_CONVENIO,
       BB_WALLET,
       BB_WALLET_VARIATION,
@@ -101,24 +101,6 @@ export class CreateBoleto {
       cidadeComprador,
       estadoComprador,
       numeroBoleto,
-      total,
-    });
-
-    // generate PDF
-    const linkBoleto = await generateBoleto({
-      environment,
-      agencia: BB_AGENCIA,
-      conta: BB_CONTA,
-      bbConvenio: BB_CONVENIO,
-      bbWallet: BB_WALLET,
-      cepCliente,
-      cidadeComprador,
-      codigoBarraNumerico: data.codigoBarraNumerico,
-      dataVencimento: formatDate(addDays(new Date(), 1), 'dd/MM/yyyy'),
-      enderecoComprador,
-      estadoComprador,
-      nomeComprador,
-      numeroBoleto: data.numero,
       total,
     });
 

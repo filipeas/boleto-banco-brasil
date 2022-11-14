@@ -2,11 +2,17 @@ import { IBoletoRepository, ICreateBoleto } from "@application/repositories/bole
 import { AsyncMaybe } from "@core/logic/maybe";
 import { IBoleto } from "@domain/boleto/dto/boleto.dto";
 import { BB, IResponseCreateBoleto } from "../../utils/bb";
+import { generateBoleto } from "@infra/utils/generate-boleto";
+import { formatDate } from "@infra/utils/format-date";
+import { addDays } from "date-fns";
 
 export class BoletoRepository implements IBoletoRepository {
     async createBoleto({
+        environment,
         BB_API_KEY,
         BB_BASIC_CREDENTIALS,
+        BB_AGENCIA,
+        BB_CONTA,
         BB_CONVENIO,
         BB_WALLET,
         BB_WALLET_VARIATION,
@@ -43,6 +49,24 @@ export class BoletoRepository implements IBoletoRepository {
             nomeComprador,
             numeroBoleto,
             total
+        });
+
+        // generate PDF
+        const linkBoleto = await generateBoleto({
+            environment,
+            agencia: BB_AGENCIA,
+            conta: BB_CONTA,
+            bbConvenio: BB_CONVENIO,
+            bbWallet: BB_WALLET,
+            cepCliente,
+            cidadeComprador,
+            codigoBarraNumerico: request.codigoBarraNumerico,
+            dataVencimento: formatDate(addDays(new Date(), 1), 'dd/MM/yyyy'),
+            enderecoComprador,
+            estadoComprador,
+            nomeComprador,
+            numeroBoleto: request.numero,
+            total,
         });
 
         // return boleto

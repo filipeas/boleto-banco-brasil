@@ -4,8 +4,11 @@ import { IBoleto } from "@domain/boleto/dto/boleto.dto";
 import { IResponseCreateBoleto } from "@infra/utils/bb";
 
 export type ICreateBoleto = {
+    environment: IEnvironment;
     BB_API_KEY: string;
     BB_BASIC_CREDENTIALS: string;
+    BB_AGENCIA: string;
+    BB_CONTA: string;
     BB_CONVENIO: string;
     BB_WALLET: string;
     BB_WALLET_VARIATION: string;
