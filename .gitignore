@@ -3,4 +3,4 @@ node_modules
 tmp
 .env
 package-lock.json
-index.js 
+testing
