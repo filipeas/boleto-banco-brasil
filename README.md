@@ -65,3 +65,6 @@ Para verificar a execução do SDK, execute:
     [ ] remover .env do projeto e fazer o usuario passar informacoes por parametro
     [ ] remover testes funcionais, pois eles so funcionam se for colocado a autenticacao no .env
     [ ] implementar testes unitários
+    [ ] fazer com que a criação de boleto busque sempre a raíz do projeto corrente, para que a pasta tmp seja criada na raíz do projeto
+    [ ] criar workflow para automatizar atualização de pacote no npm
+    [ ] criar pacote no npm
