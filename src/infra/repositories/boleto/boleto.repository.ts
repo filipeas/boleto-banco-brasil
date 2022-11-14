@@ -1,11 +1,11 @@
 import { IBoletoRepository, ICreateBoleto } from "@application/repositories/boleto/boleto.repository";
 import { AsyncMaybe } from "@core/logic/maybe";
 import { IBoleto } from "@domain/boleto/dto/boleto.dto";
-import { convertDateToAmericanFormat, formatDate } from "@infra/utils/format-date";
 import { BB, IResponseCreateBoleto } from "../../utils/bb";
 
 export class BoletoRepository implements IBoletoRepository {
     async createBoleto({
+        environment,
         BB_API_KEY,
         BB_BASIC_CREDENTIALS,
         BB_CONVENIO,

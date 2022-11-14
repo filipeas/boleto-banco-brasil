@@ -9,8 +9,10 @@ import crypto from 'crypto';
 import { generateBoleto } from "@infra/utils/generate-boleto";
 import { formatDate } from "@infra/utils/format-date";
 import { addDays } from "date-fns";
+import { IEnvironment } from "@core/dto/environment";
 
 type IRequest = {
+  environment: IEnvironment;
   BB_API_KEY: string;
   BB_BASIC_CREDENTIALS: string;
   BB_CONVENIO: string;
@@ -40,6 +42,7 @@ export class CreateBoleto {
   ) { }
 
   async run({
+    environment,
     BB_API_KEY,
     BB_BASIC_CREDENTIALS,
     BB_CONVENIO,
@@ -73,14 +76,16 @@ export class CreateBoleto {
     }
 
     // size of numero do boleto must be 10 characters (get the last 10 characters and add 1 for take next boleto)
+    console.log('Executando em modo: ' + environment);
     let numeroBoleto;
-    if (process.env.BB_ENVIRONMENT === 'dev') {
+    if (environment === 'dev') {
       numeroBoleto = String(crypto.randomInt(10000, 1000000)).padStart(10, '0');
     } else {
       numeroBoleto = String(Number(lastBoleto.numeroBoletoBB.substring(10)) + 1).padStart(10, '0');
     }
 
     const data = await this.boletoRepository.createBoleto({
+      environment,
       BB_API_KEY,
       BB_BASIC_CREDENTIALS,
       BB_CONVENIO,
@@ -105,6 +110,7 @@ export class CreateBoleto {
 
     // generate PDF
     const linkBoleto = generateBoleto({
+      environment,
       agencia: BB_AGENCIA,
       conta: BB_CONTA,
       bbConvenio: BB_CONVENIO,
@@ -122,9 +128,19 @@ export class CreateBoleto {
 
     // create boleto
     const boleto = Boleto.create({
-      conta: BB_CONTA,
-      numero: data.numero,
-      sequencia: Number(data.ticketSequence),
+      carteiraConvenio: BB_CONVENIO,
+      codigoEstadoTituloCobranca: '',
+      contrato: '',
+      dataCredito: '',
+      dataMovimento: '',
+      dataRegistro: '',
+      dataVencimento: '',
+      estadoTituloCobranca: '',
+      numeroBoletoBB: '',
+      valorAtual: '',
+      valorOriginal: '',
+      valorPago: '',
+      variacaoCarteiraConvenio: ''
     });
 
     return right(BoletoMapper.toDto(boleto));

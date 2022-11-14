@@ -7,6 +7,7 @@ const boletoRepository = new BoletoRepository();
 const createBoleto = new CreateBoleto(boletoRepository);
 const result = createBoleto.run(
   {
+    environment: 'dev',
     BB_API_KEY: String(process.env.BB_API_KEY),
     BB_BASIC_CREDENTIALS: String(process.env.BB_BASIC_CREDENTIALS),
     BB_CONVENIO: String(process.env.BB_CONVENIO),

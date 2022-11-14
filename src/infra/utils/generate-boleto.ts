@@ -7,6 +7,7 @@ import { DOMImplementation, XMLSerializer } from 'xmldom';
 import svg64 from 'svg64';
 import { generateLink } from './generate-link';
 import { formatDate } from './format-date';
+import { IEnvironment } from '@core/dto/environment';
 
 /*
 #################################################
@@ -267,6 +268,7 @@ function formatacaoConvenio7(
 }
 
 type IRequest = {
+  environment: IEnvironment;
   codigoBarraNumerico: string;
   // linhaDigitavel: string;
   bbConvenio: string;
@@ -287,6 +289,7 @@ type IRequest = {
 };
 
 export async function generateBoleto({
+  environment,
   numeroBoleto,
   codigoBarraNumerico,
   // linhaDigitavel,
@@ -419,23 +422,38 @@ export async function generateBoleto({
   const html = templateHTML({ dataBoleto, barcode: b64 });
   // const html = templateHTML({ data, images });
 
-  const pdfRootPath = path.resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    'tmp',
-    'uploads',
-    'boletos',
-  );
+  let pdfRootPath;
+  if (environment === 'dev') {
+    pdfRootPath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      '..',
+      '..',
+      'tmp',
+      'uploads',
+      'boletos',
+    );
+  } else {
+    pdfRootPath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'tmp',
+      'uploads',
+      'boletos',
+    );
+  }
 
   if (!fs.existsSync(pdfRootPath)) {
     fs.mkdirSync(pdfRootPath, { recursive: true });
   }
-  
+
   const milis = new Date().getTime();
   const pdfPath = path.join(pdfRootPath, `boleto-${milis}.pdf`);
-  
+
   pdf
     .create(html, {
       format: 'A4',

@@ -2,8 +2,10 @@ import 'dotenv/config';
 import 'reflect-metadata';
 import { BoletoRepository } from "@infra/repositories/boleto/boleto.repository";
 import { CreateBoleto } from '@application/usecases/boleto/create-boleto';
+import { IEnvironment } from '@core/dto/environment';
 
 export async function createBoleto(
+  environment: IEnvironment,
   BB_API_KEY: string,
   BB_BASIC_CREDENTIALS: string,
   BB_CONVENIO: string,
@@ -28,6 +30,7 @@ export async function createBoleto(
 
   const result = await createBoleto.run(
     {
+      environment,
       BB_API_KEY,
       BB_BASIC_CREDENTIALS,
       BB_CONVENIO,
