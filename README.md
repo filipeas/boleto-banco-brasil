@@ -41,7 +41,7 @@ stateDiagram-v2
 ## Modelo do PDF do boleto gerado
 Abaixo mostramos o modelo que o SDK gera do boleto:
 
-![image](https://user-images.githubusercontent.com/23065588/201707680-ff8dbd6f-9340-4948-843d-5bb7aae08971.png)
+![image](https://user-images.githubusercontent.com/23065588/201737206-96211474-1cf4-46db-95ea-71868a5e9a38.png)
 
 ## O que esse SDK propõe?
 - Gerar boletos válidos do Banco do Brasil. Mas como?

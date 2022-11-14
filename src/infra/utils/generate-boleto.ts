@@ -417,9 +417,20 @@ export async function generateBoleto({
 
   const b64 = svg64(svgText);
 
+  // read logo banco do brasil
+  const logoPath = path.resolve(
+    __dirname,
+    '..',
+    '..',
+    'public',
+    'images',
+    'logobb.jpg',
+  );
+  const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
+
   const templateHtml = fs.readFileSync(templatePath).toString('utf-8');
   const templateHTML = handlebars.compile(templateHtml);
-  const html = templateHTML({ dataBoleto, barcode: b64 });
+  const html = templateHTML({ dataBoleto, barcode: b64, logobb: logoBase64 });
   // const html = templateHTML({ data, images });
 
   const pdfRootPath = path.resolve(
