@@ -1,6 +1,6 @@
 {
   "name": "boleto-banco-brasil",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "SDK para boletos do Banco do Brasil",
   "main": "dist/index.js",
   "repository": {

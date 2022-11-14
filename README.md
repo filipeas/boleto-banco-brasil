@@ -2,17 +2,22 @@
 <h3 align="center">Gere boletos de forma mais fácil com esse SDK, controlando sempre<br> o último boleto gerado de forma simples.</h3>
 <p align="center">
         <a href="https://github.com/filipeas/boleto-banco-brasil/releases/tag/0.1.0" alt="Version">
-        <img src="https://img.shields.io/badge/version-0.0.6-green" /></a>
+        <img src="https://img.shields.io/badge/version-0.0.7-green" /></a>
 </p>
 
 ## Configuração
-1) Baixe o projeto.
-2) Instale as dependências com ``` yarn ``` ou ``` npm i ```.
-3) Use a importação ``` const { createBoleto } = require('boleto-banco-brasil'); ``` para utilizar no seu projeto. Estão implementadas as funções: ``` createBoleto() ```. Preencha os atributos das funções corretamente com suas informações da sua conta do Banco do Brasil. 
+1) Baixe o projeto com ``` npm i boleto-banco-brasil ```.
+2) (OPCIONAL) Garanta a instalação das dependências com ``` yarn ``` ou ``` npm i ```.
+3) Use a importação ``` const { createBoleto, findLastBoleto } = require('boleto-banco-brasil'); ``` para utilizar no seu projeto. Estão implementadas as funções: ``` createBoleto() ``` e ``` findLastBoleto() ```. Preencha os atributos das funções corretamente com suas informações da sua conta do Banco do Brasil. 
 4) Use suas autenticações para sandbox ou para produção quando chamar as funções do passo 3).
 
+## Como usar
+1) Use a importação onde você precisar dentro do seu projeto.
+2) A função ``` createBoleto ``` irá criar um boleto novo.
+3) A função ``` findLastBoleto ``` buscará o último boleto gerado.
+
 ## Observações gerais
-1) Os boletos em PDF são salvos na pasta ``` tmp/uploads/boletos/ ```.
+1) Os boletos em PDF são salvos na pasta ``` tmp/uploads/boletos/ ``` na raíz do seu projeto.
 2) É possível testar a criação do boleto buildando o projeto e executando a função diretamente [(Olhar seção: Como fazer um teste rápido das funcionaidades do SDK)](https://github.com/filipeas/boleto-banco-brasil#como-fazer-um-teste-r%C3%A1pido-das-funcionaidades-do-sdk).
 3) Tenha em mente em usar configurações de teste da sua conta do Banco do Brasil, para evitar usar os números reais da API.
 4) Durante seus testes em algum momento talvez a criação do boleto falhe devido ao número do boleto gerado já está em uso. Mas não se preocupe, isso é normal pois a API do Banco do Brasil é compartilhada com todos os Devs da API. logo, por exemplo, se você gerou um número de boleto 1 não necessáriamente o seu próximo número será 2. Assim, adicionamos uma flag de controle de ambiente de desenvolvimento chamada ``` environment ```, onde se você estiver executando em ambiente de desenvolvimento, você deve colocar a flag ``` dev ``` e em ambiente de produção você deve colocar a flag ``` prod ```. A flag ``` dev ``` criará números de boleto aleatório, já a ``` prod ``` procurará o último boleto da sua conta.
