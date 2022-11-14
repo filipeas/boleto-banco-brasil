@@ -38,6 +38,11 @@ stateDiagram-v2
 
 ![diagram drawio (2)](https://user-images.githubusercontent.com/23065588/201450109-1f09c123-22cd-45b7-9e27-a783e3e8496a.png)
 
+## Modelo do PDF do boleto gerado
+Abaixo mostramos o modelo que o SDK gera do boleto:
+
+![image](https://user-images.githubusercontent.com/23065588/201707680-ff8dbd6f-9340-4948-843d-5bb7aae08971.png)
+
 ## O que esse SDK propõe?
 - Gerar boletos válidos do Banco do Brasil. Mas como?
     - O SDK irá requisitar sempre a API do Banco do Brasil usando suas credênciais para achar o último boleto gerado válido. Ele irá procurar por um range que você pode configurar, porém o padrão será de até 3 dias. Após essa listagem, será pego o último boleto e seu número será incrementado para o novo boleto válido.
