@@ -5,11 +5,10 @@ on:
             - master
         # types: [closed]
 jobs:
-build:
+  build:
     name: 🎉 Develop to develop
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -26,12 +25,11 @@ build:
 
       - name: Build package
         run: yarn build
-            
-
+      
     environment:
       name: NPM
       url: https://www.npmjs.com/package/boleto-banco-brasil
-
+  
   npm-publish:
     name: npm-publish
     runs-on: ubuntu-latest
