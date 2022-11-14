@@ -69,10 +69,4 @@ Para verificar a execução do SDK, execute:
 4) Execute ``` node dist/test/find-last-boleto.js ``` para visualizar o último boleto.
 
 ## Melhorias pendentes
-- [x] remover .env do projeto e fazer o usuario passar informacoes por parametro
-- [x] remover testes funcionais, pois eles so funcionam se for colocado a autenticacao no .env
-- [x] implementar testes unitários
-- [x] fazer com que a criação de boleto busque sempre a raíz do projeto corrente, para que a pasta tmp seja criada na raíz do projeto
-- [ ] criar workflow para automatizar atualização de pacote no npm
-- [ ] criar pacote no npm
 - [ ] [BUG] caso a conta seja nova e nunca foi gerado um boleto, a criação do boleto falhará, pois ele tentará achar o último boleto gerado infinitamente
