@@ -422,30 +422,12 @@ export async function generateBoleto({
   const html = templateHTML({ dataBoleto, barcode: b64 });
   // const html = templateHTML({ data, images });
 
-  let pdfRootPath;
-  if (environment === 'dev') {
-    pdfRootPath = path.resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      '..',
-      'tmp',
-      'uploads',
-      'boletos',
-    );
-  } else {
-    pdfRootPath = path.resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'tmp',
-      'uploads',
-      'boletos',
-    );
-  }
+  const pdfRootPath = path.resolve(
+    process.cwd(),
+    'tmp',
+    'uploads',
+    'boletos',
+  );
 
   if (!fs.existsSync(pdfRootPath)) {
     fs.mkdirSync(pdfRootPath, { recursive: true });
@@ -461,7 +443,7 @@ export async function generateBoleto({
       // height: '29.7cm',
     })
     .toFile(pdfPath, (err, fileData) => {
-      console.log(`Salvando PDF. ${err} - ${fileData}`);
+      console.log(`Salvando PDF.`);
       if (err) return console.log(err);
       console.log('Pdf generated.');
       return fileData;

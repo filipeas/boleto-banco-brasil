@@ -5,7 +5,6 @@ import { BB, IResponseCreateBoleto } from "../../utils/bb";
 
 export class BoletoRepository implements IBoletoRepository {
     async createBoleto({
-        environment,
         BB_API_KEY,
         BB_BASIC_CREDENTIALS,
         BB_CONVENIO,

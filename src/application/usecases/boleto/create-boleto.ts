@@ -85,7 +85,6 @@ export class CreateBoleto {
     }
 
     const data = await this.boletoRepository.createBoleto({
-      environment,
       BB_API_KEY,
       BB_BASIC_CREDENTIALS,
       BB_CONVENIO,
