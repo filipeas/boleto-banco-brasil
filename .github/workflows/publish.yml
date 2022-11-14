@@ -6,7 +6,7 @@ on:
         # types: [closed]
 jobs:
   build:
-    name: 🎉 Build and test
+    name: 🎉 Build, Test and Publish
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
@@ -28,7 +28,7 @@ jobs:
       
       - name: Checkout repository
         uses: actions/checkout@master
-        
+
       - name: Set up Node.js
         uses: actions/setup-node@master
         with:
