@@ -20,7 +20,8 @@
     "build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
     "start:dev": "tsnd -r tsconfig-paths/register --exit-child --poll --inspect --ignore-watch node_modules --transpile-only --respawn src/infra/http/server.ts",
     "commit": "git-cz",
-    "test": "jest"
+    "test": "jest",
+    "bb:purchase": "tsnd --exit-child --transpile-only --ignore-watch node_modules app/core/create-purchase.ts"
   },
   "devDependencies": {
     "@babel/cli": "^7.18.6",
