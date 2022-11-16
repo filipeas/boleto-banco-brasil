@@ -1,30 +1,30 @@
-import { BBClient, ICreateBBPurchase } from '../adapters/bb-client';
+import { BBClient } from '../adapters/bb-client';
 
 /**
  * Esse ponto é bem importante, como o usuário não vai ter acesso ao código, essas variáveis ambiente não podem estar aqui,
  * como é uma lib, a gente vai esperar que ele informe pela aplicação dele
  */
 const bbClient = new BBClient({
-  BB_API_KEY: 'lasldhskldhsadjksahdjsa',
-  BB_BASIC_CREDENTIALS: 'adsadshadklsahdksajhdksahdsajkdhjsa',
-  BB_CONVENIO: '495878',
-  BB_WALLET: '4687654',
-  BB_WALLET_VARIATION: '17',
-  BB_AGENCIA: '789456',
-  BB_API_URL: 'https://localhost:3333/api-url',
-  BB_APP_KEY: 'api key',
-  BB_CONTA: '7875465',
-  BB_OAUTH_URL: 'https://localshot:3333/oauth-url',
+  BB_API_KEY: 'api key',
+  BB_BASIC_CREDENTIALS: 'Basic Auth',
+  BB_CONVENIO: 'convenio',
+  BB_WALLET: 'wallet',
+  BB_WALLET_VARIATION: 'variation',
+  BB_AGENCIA: '123',
+  BB_API_URL: 'http://localhost:333/app/api',
+  BB_APP_KEY: 'app key',
+  BB_CONTA: '123456',
+  BB_OAUTH_URL: 'http://localhost:333/app/oauth',
 })
 
 
-bbClient.createPurchase<ICreateBBPurchase, {}>({
-  bairroComprador: 'Piçarreira',
-  cepCliente: '64000-000',
-  cidadeComprador: 'Teresina',
-  cpfComprador: '000.000.000-00',
-  enderecoComprador: 'Rua de teste',
-  estadoComprador: 'PI',
-  nomeComprador: 'Rennan Oliveira',
-  total: 12
-}).then();
+bbClient.createPurchase({
+  customerNeighborhood: 'Piçarreira',
+  customerZipCode: '64000000',
+  customerCity: 'Teresina',
+  customerCPF: '00000000000',
+  customerAddress: 'Rua beco da paz, 2064',
+  customerStateCode: 'PI',
+  customerName: 'Rennan Oliveira',
+  purchaseValue: 12
+}).then(response => console.log(response));
