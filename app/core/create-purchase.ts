@@ -1,30 +1,28 @@
 import { BBClient } from '../adapters/bb-client';
 
-/**
- * Esse ponto é bem importante, como o usuário não vai ter acesso ao código, essas variáveis ambiente não podem estar aqui,
- * como é uma lib, a gente vai esperar que ele informe pela aplicação dele
- */
-const bbClient = new BBClient({
-  BB_API_KEY: 'api key',
-  BB_BASIC_CREDENTIALS: 'Basic Auth',
-  BB_CONVENIO: 'convenio',
-  BB_WALLET: 'wallet',
-  BB_WALLET_VARIATION: 'variation',
-  BB_AGENCIA: '123',
-  BB_API_URL: 'http://localhost:333/app/api',
-  BB_APP_KEY: 'app key',
-  BB_CONTA: '123456',
-  BB_OAUTH_URL: 'http://localhost:333/app/oauth',
-})
+// instance of client
+// const bbClient = new BBClient({
+//   BB_API_KEY: '0000000000111111111100000000001111111111',
+//   BB_BASIC_CREDENTIALS: 'Basic key',
+//   BB_CONVENIO: '0000000',
+//   BB_WALLET: '00',
+//   BB_WALLET_VARIATION: '99',
+//   BB_AGENCIA: '999',
+//   BB_CONTA: '09876',
+//   ENVIRONMENT: 'dev'
+// });
 
+// get last purchase
+// bbClient.searchLastPurchase().then(response => console.log(response));
 
-bbClient.createPurchase({
-  customerNeighborhood: 'Piçarreira',
-  customerZipCode: '64000000',
-  customerCity: 'Teresina',
-  customerCPF: '00000000000',
-  customerAddress: 'Rua beco da paz, 2064',
-  customerStateCode: 'PI',
-  customerName: 'Rennan Oliveira',
-  purchaseValue: 12
-}).then(response => console.log(response));
+// generate a new purchase
+// bbClient.createPurchase({
+//   customerNeighborhood: 'Piçarreira',
+//   customerZipCode: '64000000',
+//   customerCity: 'Teresina',
+//   customerCPF: '96050176876',
+//   customerAddress: 'Rua beco da paz, 2064',
+//   customerStateCode: 'PI',
+//   customerName: 'Rennan Oliveira',
+//   purchaseValue: 12
+// }).then(response => console.log(response));

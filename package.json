@@ -1,6 +1,6 @@
 {
   "name": "boleto-banco-brasil",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "SDK para boletos do Banco do Brasil",
   "main": "dist/index.js",
   "repository": {
@@ -8,6 +8,10 @@
     "url": "https://github.com/filipeas/boleto-banco-brasil.git"
   },
   "author": "filipe a.s <felipealvessampaio@hotmail.com>",
+  "contributors": [
+    "RennanD <https://github.com/RennanD>",
+    "filipe a.s <felipealvessampaio@hotmail.com>"
+  ],
   "license": "MIT",
   "keywords": [
     "banco-do-brasil",
@@ -68,7 +72,6 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "cors": "^2.8.5",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
     "express": "^4.18.1",
@@ -76,7 +79,6 @@
     "handlebars": "^4.7.7",
     "html-pdf": "^2.0.0",
     "jsbarcode": "^3.11.5",
-    "nodemailer": "^6.7.5",
     "reflect-metadata": "^0.1.13",
     "svg64": "^1.2.0",
     "tsyringe": "^4.6.0",

@@ -1,7 +1,3 @@
-/**
- * Aqui eu só renomeei a tipagem para inglês, não vai fazer tanta difereça então pode deixar assim ou como já mesmo
- */
-
 export type ICreateBBPurchaseProps = {
   customerName: string;
   customerCPF: string;
@@ -43,6 +39,30 @@ export type IResponseBBPurchaseProps = {
   };
 }
 
+export type IPurchase = {
+  numeroBoletoBB: string;
+  dataRegistro: string;
+  dataVencimento: string;
+  valorOriginal: string;
+  carteiraConvenio: string;
+  variacaoCarteiraConvenio: string;
+  codigoEstadoTituloCobranca: string;
+  estadoTituloCobranca: string;
+  contrato: string;
+  dataMovimento: string;
+  dataCredito: string;
+  valorAtual: string;
+  valorPago: string;
+}
+
+export type IResponseSearchBBPurchase = {
+  indicadorContinuidade: string;
+  quantidadeRegistros: string;
+  proximoIndice: string;
+  boletos: IPurchase[];
+};
+
 export interface IClientProvider {
-  createPurchase(data: ICreateBBPurchaseProps): Promise<IResponseBBPurchaseProps>
+  createPurchase(data: ICreateBBPurchaseProps): Promise<IResponseBBPurchaseProps>;
+  searchLastPurchase(): Promise<IPurchase>;
 }
