@@ -120,8 +120,7 @@ export class BBClient implements IClientProvider {
   /**
    * Método responsável por buscar o último boleto válido da API do Banco do Brasil.
    * 
-   * @param param0 
-   * @returns 
+   * @returns IPurchase Boleto
    */
   async searchLastPurchase(): Promise<IPurchase> {
     // set authentication
