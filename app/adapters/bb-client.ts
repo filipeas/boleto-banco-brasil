@@ -33,6 +33,7 @@ export class BBClient implements IClientProvider {
   private BB_CONTA!: string;
   private BB_OAUTH_URL!: string;
   private ENVIRONMENT?: 'dev' | 'prod';
+  private AUTHENTICATION!: string;
 
   /**
    * Método construtor responsável por receber as váriaveis de conexão com a API do Banco do Brasil.
@@ -112,11 +113,7 @@ export class BBClient implements IClientProvider {
         },
       });
     } catch (err) {
-      throw new Error('Não foi possível se autenticar. Verifique os campos informados')
-      // console.log('Não foi possível se autenticar. Verifique os campos informados')
-      // const isAppError = err instanceof AxiosError
-      // const message = isAppError ? `${err.response?.data.erros[0].mensagem} - ${err.response?.data.erros[0].ocorrencia}` : 'Não foi possível se autenticar.'
-      // throw new PurchaseError(message);
+      throw new Error('Houve um erro na autenticação com a API. Por favor, verifique sua BB_BASIC_CREDENTIALS.');
     }
   }
 
@@ -127,6 +124,7 @@ export class BBClient implements IClientProvider {
    * @returns 
    */
   async searchLastPurchase(): Promise<IPurchase> {
+    // set authentication
     const auth = await this.auth();
     const accessToken = auth.data.access_token;
 
@@ -143,6 +141,7 @@ export class BBClient implements IClientProvider {
         const today = formatDate(addDays(new Date(), newDays), 'dd.MM.yyyy');
 
         const url = `${this.BB_API_URL}/boletos?${this.BB_APP_KEY}=${this.BB_API_KEY}&indicadorSituacao=B&agenciaBeneficiario=${this.BB_AGENCIA}&contaBeneficiario=${this.BB_CONTA}&dataInicioMovimento=${yesterday}&dataFimMovimento=${today}`;
+        console.log(url)
         const res = await axios.get(`${url}`, {
           headers: {
             'Content-Type': 'application/json',
@@ -158,12 +157,8 @@ export class BBClient implements IClientProvider {
 
         newDays -= increment;
         interval += increment;
-      } catch (error) {
-        throw new Error('Houve um erro ao buscar intervalo de boletos');
-        // console.log({ error })
-        // const isAppError = error instanceof AxiosError
-        // const message = isAppError ? `Houve um erro na pesquisa de boletos do Banco do Brasil. Err: ${error.response?.data.erros[0].mensagem} - ${error.response?.data.erros[0].ocorrencia}` : 'Falha ao buscar último boleto.'
-        // throw Error(message);
+      } catch (err) {
+        throw new Error('Houve um erro ao buscar intervalo de boletos. Verifique os atributos de autenticação.');
       }
     } while (!checkLastInterval);
 
