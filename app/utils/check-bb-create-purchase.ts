@@ -2,7 +2,6 @@ import { ICreateBBPurchaseProps } from "app/providers/client.provider";
 
 export function CheckBBCreatePurchase(data: ICreateBBPurchaseProps) {
   if (!data.customerName) {
-    console.log('oi')
     throw new Error('Informe o nome do cliente');
   }
 
