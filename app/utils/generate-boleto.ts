@@ -1,19 +1,13 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import pdf from 'html-pdf';
+import handlebars from 'handlebars';
+import JSBarcode from 'jsbarcode';
+import { DOMImplementation, XMLSerializer } from 'xmldom';
+import svg64 from 'svg64';
+import { generateLink } from './generate-link';
+import { formatDate } from './format-date';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.generateBoleto = generateBoleto;
-var _fs = _interopRequireDefault(require("fs"));
-var _path = _interopRequireDefault(require("path"));
-var _htmlPdf = _interopRequireDefault(require("html-pdf"));
-var _handlebars = _interopRequireDefault(require("handlebars"));
-var _jsbarcode = _interopRequireDefault(require("jsbarcode"));
-var _xmldom = require("xmldom");
-var _svg = _interopRequireDefault(require("svg64"));
-var _generateLink = require("./generate-link");
-var _formatDate = require("./format-date");
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 /*
 #################################################
 FUNÇÃO DO MÓDULO 10 RETIRADA DO PHPBOLETO
@@ -21,11 +15,12 @@ ESTA FUNÇÃO PEGA O DÍGITO VERIFICADOR DO PRIMEIRO, SEGUNDO
 E TERCEIRO CAMPOS DA LINHA DIGITÁVEL
 #################################################
 */
-function modulo10(num) {
+function modulo10(num: string) {
   let numtotal10 = '0';
   let fator = 2;
-  const numeros = [];
-  const parcial10 = [];
+
+  const numeros: number[] = [];
+  const parcial10: number[] = [];
   for (let i = num.length; i > 0; i--) {
     numeros[i] = Number(num.substr(i - 1, 1));
     parcial10[i] = numeros[i] * fator;
@@ -36,6 +31,7 @@ function modulo10(num) {
       fator = 2;
     }
   }
+
   let soma = 0;
   for (let i = numtotal10.length; i > 0; i--) {
     numeros[i] = Number(numtotal10.substr(i - 1, 1));
@@ -46,6 +42,7 @@ function modulo10(num) {
   if (resto === 0) {
     digito = 0;
   }
+
   return digito;
 }
 
@@ -60,11 +57,12 @@ CONTA
 CAMPO 4 DA LINHA DIGITÁVEL
 #################################################
 */
-function modulo11(num, base = 9, r = 0) {
+function modulo11(num: string, base = 9, r = 0) {
   let soma = 0;
   let fator = 2;
-  const numeros = [];
-  const parcial = [];
+
+  const numeros: number[] = [];
+  const parcial: number[] = [];
   for (let i = num.length; i > 0; i--) {
     numeros[i] = Number(num.substr(i - 1, 1));
     parcial[i] = numeros[i] * fator;
@@ -74,9 +72,10 @@ function modulo11(num, base = 9, r = 0) {
     }
     fator++;
   }
+
   if (r === 0) {
     soma *= 10;
-    let digito = soma % 11;
+    let digito: string | number = soma % 11;
 
     // corrigido
     if (digito === 10) {
@@ -108,18 +107,22 @@ function modulo11(num, base = 9, r = 0) {
     }
     return digito;
   }
+
   if (r === 1) {
     const resto = soma % 11;
     return resto;
   }
+
   return '';
 }
-function geraCodigoBanco(numero) {
+
+function geraCodigoBanco(numero: string) {
   const parte1 = numero.substr(0, 3);
   const parte2 = modulo11(parte1);
   return `${parte1}-${parte2}`;
 }
-function _dateToDays(year, month, day) {
+
+function _dateToDays(year: string, month: string, day: string) {
   let century = Number(year.substr(0, 2));
   let newYear = Number(year.substr(2, 2));
   let newMonth = Number(month);
@@ -134,9 +137,17 @@ function _dateToDays(year, month, day) {
       century--;
     }
   }
-  return Math.floor(146097 * century / 4) + Math.floor(1461 * newYear / 4) + Math.floor((153 * newMonth + 2) / 5) + Number(day) + 1721119;
+
+  return (
+    Math.floor((146097 * century) / 4) +
+    Math.floor((1461 * newYear) / 4) +
+    Math.floor((153 * newMonth + 2) / 5) +
+    Number(day) +
+    1721119
+  );
 }
-function fatorVencimento(data) {
+
+function fatorVencimento(data: string) {
   const newData = data.split('/');
   const ano = newData[2];
   const mes = newData[1];
@@ -148,7 +159,7 @@ function fatorVencimento(data) {
 Montagem da linha digitável - Função tirada do PHPBoleto
 Não mudei nada
 */
-function montaLinhaDigitavel(linha) {
+function montaLinhaDigitavel(linha: string) {
   // Posição 	Conteúdo
   // 1 a 3    Número do banco
   // 4        Código da Moeda - 9 para Real
@@ -191,9 +202,16 @@ function montaLinhaDigitavel(linha) {
   // indicacao de zeros a esquerda e sem edicao (sem ponto e virgula). Quando se
   // tratar de valor zerado, a representacao deve ser 000 (tres zeros).
   const campo5 = linha.substr(5, 14);
+
   return `${campo1} ${campo2} ${campo3} ${campo4} ${campo5}`;
 }
-function formataNumero(numero, loop, insert, tipo = 'geral') {
+
+function formataNumero(
+  numero: string,
+  loop: number,
+  insert: number,
+  tipo = 'geral',
+): string {
   let newNumero = numero;
   if (tipo === 'geral') {
     newNumero = numero.replace(',', '');
@@ -201,6 +219,7 @@ function formataNumero(numero, loop, insert, tipo = 'geral') {
       newNumero = `${insert}${newNumero}`;
     }
   }
+
   if (tipo === 'valor') {
     /*
     retira as virgulas
@@ -212,29 +231,63 @@ function formataNumero(numero, loop, insert, tipo = 'geral') {
       newNumero = `${insert}${newNumero}`;
     }
   }
+
   if (tipo === 'convenio') {
     newNumero = numero;
     while (newNumero.length < loop) {
       newNumero = `${newNumero}${insert}`;
     }
   }
+
   return newNumero;
 }
 
 // Carteira 18 com Convênio de 7 dígitos
-function formatacaoConvenio7(codigobanco, nummoeda, fatorvencimento, valor, livrezeros, convenio, nossonumero, carteira) {
+function formatacaoConvenio7(
+  codigobanco: string,
+  nummoeda: string,
+  fatorvencimento: string,
+  valor: string,
+  livrezeros: string,
+  convenio: string,
+  nossonumero: string,
+  carteira: string,
+) {
   const newConvenio = formataNumero(convenio, 7, 0, 'convenio');
 
   // Nosso número de até 10 dígitos
   let newNossoNumero = formataNumero(nossonumero, 10, 0);
-  const dv = modulo11(`${codigobanco}${nummoeda}${fatorvencimento}${valor}${livrezeros}${newConvenio}${newNossoNumero}${carteira}`);
+  const dv = modulo11(
+    `${codigobanco}${nummoeda}${fatorvencimento}${valor}${livrezeros}${newConvenio}${newNossoNumero}${carteira}`,
+  );
   const linha = `${codigobanco}${nummoeda}${dv}${fatorvencimento}${valor}${livrezeros}${newConvenio}${newNossoNumero}${carteira}`;
   newNossoNumero = `${newConvenio}${newNossoNumero}`;
   return newNossoNumero;
   // Não existe DV na composição do nosso-número para convênios de sete posições
 }
 
-async function generateBoleto({
+type IRequest = {
+  environment: 'dev' | 'prod';
+  codigoBarraNumerico: string;
+  // linhaDigitavel: string;
+  bbConvenio: string;
+  bbWallet: string;
+  // bbWalletVariation: string;
+  agencia: string;
+  conta: string;
+  total: number;
+  numeroBoleto: string;
+  dataVencimento: string;
+  nomeComprador: string;
+  cepCliente: string;
+  // cpfComprador: string;
+  enderecoComprador: string;
+  cidadeComprador: string;
+  // bairroComprador: string;
+  estadoComprador: string;
+};
+
+export async function generateBoleto({
   environment,
   numeroBoleto,
   codigoBarraNumerico,
@@ -252,25 +305,20 @@ async function generateBoleto({
   enderecoComprador,
   cidadeComprador,
   // bairroComprador,
-  estadoComprador
-}) {
+  estadoComprador,
+}: IRequest): Promise<string> {
   const codigoBanco = '001';
   const numMoeda = '9';
   const valor = total.toLocaleString('pt-br', {
-    minimumFractionDigits: 2
+    minimumFractionDigits: 2,
   });
   const dataBoleto = {
     // nosso_numero: numBoleto,
-    numero_documento: numeroBoleto,
-    // Num do pedido ou do documento
-    data_vencimento: dataVencimento,
-    // Data de Vencimento do Boleto - REGRA: Formato DD/MM/AAAA
-    data_documento: (0, _formatDate.formatDate)(new Date(), 'dd/MM/yyyy'),
-    // Data de emissão do Boleto
-    data_processamento: (0, _formatDate.formatDate)(new Date(), 'dd/MM/yyyy'),
-    // Data de processamento do boleto (opcional)
-    valor_boleto: valor,
-    // Valor do Boleto - REGRA: Com vírgula e sempre com duas casas depois da virgula
+    numero_documento: numeroBoleto, // Num do pedido ou do documento
+    data_vencimento: dataVencimento, // Data de Vencimento do Boleto - REGRA: Formato DD/MM/AAAA
+    data_documento: formatDate(new Date(), 'dd/MM/yyyy'), // Data de emissão do Boleto
+    data_processamento: formatDate(new Date(), 'dd/MM/yyyy'), // Data de processamento do boleto (opcional)
+    valor_boleto: valor, // Valor do Boleto - REGRA: Com vírgula e sempre com duas casas depois da virgula
 
     codigo_barras: codigoBarraNumerico,
     // linha_digitavel: linhaDigitavel,
@@ -279,43 +327,40 @@ async function generateBoleto({
     sacado: nomeComprador,
     endereco1: enderecoComprador,
     endereco2: `${cidadeComprador} - ${estadoComprador} - CEP: ${cepCliente}`,
+
     // INFORMACOES PARA O CLIENTE
     demonstrativo1: '',
     demonstrativo2: '',
     demonstrativo3: '',
+
     // INSTRUÇÕES PARA O CAIXA
     instrucoes1: '- Sr. Caixa, não receber após o vencimento',
     instrucoes2: '',
     instrucoes3: '',
     instrucoes4: '',
+
     // DADOS OPCIONAIS DE ACORDO COM O BANCO OU CLIENTE
     quantidade: '',
     valor_unitario: '',
     aceite: 'N',
     especie: 'R$',
     especie_doc: 'DM',
+
     // ---------------------- DADOS FIXOS DE CONFIGURAÇÃO DO SEU BOLETO --------------- //
 
     // DADOS DA SUA CONTA - BANCO DO BRASIL
-    agencia,
-    // Num da agencia, sem digito
-    conta,
-    // Num da conta, sem digito
+    agencia, // Num da agencia, sem digito
+    conta, // Num da conta, sem digito
 
     // DADOS PERSONALIZADOS - BANCO DO BRASIL
-    convenio: bbConvenio,
-    // Num do convênio - REGRA: 6 ou 7 ou 8 dígitos
-    contrato: '999999',
-    // Num do seu contrato
+    convenio: bbConvenio, // Num do convênio - REGRA: 6 ou 7 ou 8 dígitos
+    contrato: '999999', // Num do seu contrato
     carteira: bbWallet,
-    variacao_carteira: '',
-    // Variação da Carteira, com traço (opcional)
+    variacao_carteira: '', // Variação da Carteira, com traço (opcional)
 
     // TIPO DO BOLETO
-    formatacao_convenio: '7',
-    // REGRA: 8 p/ Convênio c/ 8 dígitos, 7 p/ Convênio c/ 7 dígitos, ou 6 se Convênio c/ 6 dígitos
-    formatacao_nosso_numero: '2',
-    // REGRA: Usado apenas p/ Convênio c/ 6 dígitos: informe 1 se for NossoNúmero de até 5 dígitos ou 2 para opção de até 17 dígitos
+    formatacao_convenio: '7', // REGRA: 8 p/ Convênio c/ 8 dígitos, 7 p/ Convênio c/ 7 dígitos, ou 6 se Convênio c/ 6 dígitos
+    formatacao_nosso_numero: '2', // REGRA: Usado apenas p/ Convênio c/ 6 dígitos: informe 1 se for NossoNúmero de até 5 dígitos ou 2 para opção de até 17 dígitos
 
     // SEUS DADOS
     identificacao: '',
@@ -323,57 +368,93 @@ async function generateBoleto({
     endereco: '',
     cidade_uf: 'Teresina / PI',
     cedente: 'M & F COMERCIO DE LIVROS E ALIMENTOS LTDA',
+
     linha_digitavel: montaLinhaDigitavel(codigoBarraNumerico),
-    agencia_codigo: `${agencia}-${modulo11(agencia)} / ${conta}-${modulo11(conta)}`,
-    nosso_numero: formatacaoConvenio7(codigoBanco, numMoeda, String(fatorVencimento(dataVencimento)), formataNumero(String(valor), 10, 0, 'valor'), '000000', bbConvenio, numeroBoleto, bbWallet),
-    codigo_banco_com_dv: geraCodigoBanco(codigoBanco)
+    agencia_codigo: `${agencia}-${modulo11(agencia)} / ${conta}-${modulo11(
+      conta,
+    )}`,
+    nosso_numero: formatacaoConvenio7(
+      codigoBanco,
+      numMoeda,
+      String(fatorVencimento(dataVencimento)),
+      formataNumero(String(valor), 10, 0, 'valor'),
+      '000000',
+      bbConvenio,
+      numeroBoleto,
+      bbWallet,
+    ),
+    codigo_banco_com_dv: geraCodigoBanco(codigoBanco),
   };
-  const templatePath = _path.default.resolve(__dirname, '..', '..', 'application', 'views', 'banco-do-brasil', 'boleto.hbs');
+
+  const templatePath = path.resolve(
+    __dirname,
+    '..',
+    'views',
+    'banco-do-brasil',
+    'boleto.hbs',
+  );
 
   // gerando barcode
-  const xmlSerializer = new _xmldom.XMLSerializer();
-  const document = new _xmldom.DOMImplementation().createDocument('http://www.w3.org/1999/xhtml', 'html', null);
+  const xmlSerializer = new XMLSerializer();
+  const document = new DOMImplementation().createDocument(
+    'http://www.w3.org/1999/xhtml',
+    'html',
+    null,
+  );
   const svgNode = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  (0, _jsbarcode.default)(svgNode, dataBoleto.linha_digitavel, {
+
+  JSBarcode(svgNode, dataBoleto.linha_digitavel, {
     xmlDocument: document,
     height: 50,
     width: 1,
-    displayValue: false
+    displayValue: false,
   });
+
   const svgText = xmlSerializer.serializeToString(svgNode);
-  const b64 = (0, _svg.default)(svgText);
+
+  const b64 = svg64(svgText);
 
   // read logo banco do brasil
-  const logoPath = _path.default.resolve(__dirname, '..', '..', 'public', 'images', 'logobb.jpg');
-  const logoBase64 = _fs.default.readFileSync(logoPath, {
-    encoding: 'base64'
-  });
-  const templateHtml = _fs.default.readFileSync(templatePath).toString('utf-8');
-  const templateHTML = _handlebars.default.compile(templateHtml);
-  const html = templateHTML({
-    dataBoleto,
-    barcode: b64,
-    logobb: logoBase64
-  });
+  const logoPath = path.resolve(
+    __dirname,
+    '..',
+    'public',
+    'images',
+    'logobb.jpg',
+  );
+  const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
+
+  const templateHtml = fs.readFileSync(templatePath).toString('utf-8');
+  const templateHTML = handlebars.compile(templateHtml);
+  const html = templateHTML({ dataBoleto, barcode: b64, logobb: logoBase64 });
   // const html = templateHTML({ data, images });
 
-  const pdfRootPath = _path.default.resolve(process.cwd(), 'tmp', 'uploads', 'boletos');
-  if (!_fs.default.existsSync(pdfRootPath)) {
-    _fs.default.mkdirSync(pdfRootPath, {
-      recursive: true
-    });
+  const pdfRootPath = path.resolve(
+    process.cwd(),
+    'tmp',
+    'uploads',
+    'boletos',
+  );
+
+  if (!fs.existsSync(pdfRootPath)) {
+    fs.mkdirSync(pdfRootPath, { recursive: true });
   }
+
   const milis = new Date().getTime();
-  const pdfPath = _path.default.join(pdfRootPath, `boleto-${milis}.pdf`);
-  _htmlPdf.default.create(html, {
-    format: 'A4'
-    // width: '22cm',
-    // height: '29.7cm',
-  }).toFile(pdfPath, (err, fileData) => {
-    console.log(`Salvando PDF.`);
-    if (err) return console.log(err);
-    console.log('Pdf generated.');
-    return fileData;
-  });
-  return (0, _generateLink.generateLink)('boletos', `boleto-${milis}.pdf`);
+  const pdfPath = path.join(pdfRootPath, `boleto-${milis}.pdf`);
+
+  pdf
+    .create(html, {
+      format: 'A4',
+      // width: '22cm',
+      // height: '29.7cm',
+    })
+    .toFile(pdfPath, (err, fileData) => {
+      console.log(`Salvando PDF.`);
+      if (err) return console.log(err);
+      console.log('Pdf generated.');
+      return fileData;
+    });
+
+  return generateLink('boletos', `boleto-${milis}.pdf`);
 }

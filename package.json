@@ -2,7 +2,7 @@
   "name": "boleto-banco-brasil",
   "version": "0.0.7",
   "description": "SDK para boletos do Banco do Brasil",
-  "main": "dist/index.js",
+  "main": "dist/core/client.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/filipeas/boleto-banco-brasil.git"
@@ -21,7 +21,7 @@
     "typescript"
   ],
   "scripts": {
-    "build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
+    "build": "babel app --extensions \".js,.ts\" --out-dir dist --copy-files",
     "start:dev": "tsnd -r tsconfig-paths/register --exit-child --poll --inspect --ignore-watch node_modules --transpile-only --respawn src/infra/http/server.ts",
     "commit": "git-cz",
     "test": "jest",

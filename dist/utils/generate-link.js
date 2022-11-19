@@ -5,6 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.generateLink = generateLink;
 function generateLink(folder, filename) {
-  if (filename) return `${process.env.APP_URL}/uploads/${folder}/${filename}`;
+  if (filename) return `${process.cwd()}/tmp/uploads/${folder}/${filename}`;
   return ``;
 }
