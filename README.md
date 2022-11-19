@@ -9,19 +9,22 @@
 
 ## Funcionalidades disponíveis
 1) Buscar o último boleto gerado.
-2) Gerar novo boleto a partir do último gerado.
+2) Criar novo boleto a partir do último gerado.
+3) Gerar PDF do modelo do boleto de acordo com o padrão do Banco do Brasil.
 
 ## Funcionalidades pendentes
 1) Adicionar pagamento por PIX.
 
 ## Configuração
 1) Baixe o pacote com ``` npm i boleto-banco-brasil ```.
-2) No seu projeto faça o import do pacote usando ``` const {Client} = require('boleto-banco-brasil'); ```.
+2) No seu projeto faça o import do pacote usando ``` import { BBClient } from 'boleto-banco-brasil'; ```.
 
 ## Como usar
 Instancie a classe Client:
 ```
-const bbClient = new Client({
+import { BBClient } from 'boleto-banco-brasil';
+
+const bbClient = new BBClient({
   BB_API_KEY: '0000000000111111111133333333335555555555',
   BB_BASIC_CREDENTIALS: 'Basic key',
   BB_CONVENIO: '1234567',
@@ -37,9 +40,12 @@ Tenha atenção em colocar corretamente suas credênciais da sua conta do Banco 
 
 Observe o parâmetro ``` ENVIRONMENT ```. Ele serve para você informar se quer usar o sandbox da API do Banco do Brasil ou o ambiente de produção. Use ``` dev ``` para sandbox e ``` prod ``` para produção.
 
-Para fazer uma busca do último boleto gerado use ``` bbClient.SearchLastPurchase().then(response => console.log(response)); ```.
+Para fazer uma busca do último boleto gerado use:
+ ``` 
+ bbClient.SearchLastPurchase().then(response => console.log(response)); 
+ ```
 
-E para criar um boleto a partir do último gerado, use 
+Para criar um boleto a partir do último gerado, use:
 ```
 bbClient.CreatePurchase({
   customerAddress: 'Mocambinho',
@@ -52,6 +58,46 @@ bbClient.CreatePurchase({
   purchaseValue: '1200'
 }).then(response => console.log(response));
 ```
+
+E para criar o PDF do boleto use:
+```
+bbClient.CreatePurchase({
+  customerAddress: 'Mocambinho',
+  customerCity: 'Teresina',
+  customerCPF: '96050176876',
+  customerName: 'Filipe A. Sampaio',
+  customerNeighborhood: 'Avenida Santa joana Darq',
+  customerStateCode: 'PI',
+  customerZipCode: '77458000',
+  purchaseValue: '1200'
+}).then(response => console.log(bbClient.CreatePurchaseTicket({
+  numericBarcode: response.purchaseBarCode,
+  ticketValue: 1200,
+  purchaseId: response.purschaseId,
+  dueDate: '19/11/2022',
+  customerName: 'Filipe A. Sampaio',
+  customerZipcode: '77458000',
+  customerAddress: 'Mocambinho',
+  customerCity: 'Teresina',
+  customerStateCode: 'PI',
+})));
+```
+Observe que foi usado o método de criar o boleto mesclado com o método de gerar o PDF do boleto. Separamos as duas funções pois em alguns momentos poderemos gerar uma segunda via de um boleto já gerado. Veja abaixo a chamada ao método que só gera o PDF do modelo:
+```
+bbClient.CreatePurchaseTicket({
+  numericBarcode: response.purchaseBarCode,
+  ticketValue: 1200,
+  purchaseId: response.purschaseId,
+  dueDate: '19/11/2022',
+  customerName: 'Filipe A. Sampaio',
+  customerZipcode: '77458000',
+  customerAddress: 'Mocambinho',
+  customerCity: 'Teresina',
+  customerStateCode: 'PI',
+});
+```
+Esse método por sua vez retorna o caminho onde o arquivo PDF foi salvo. Ele por padrão é salvo sempre em ``` tmp/uploads/boletos/ ```, dentro do seu projeto.
+
 
 ## Observações gerais
 1) Os boletos em PDF são salvos na pasta ``` tmp/uploads/boletos/ ``` na raíz do seu projeto.

@@ -76,9 +76,9 @@ export type ICreateBBPurchaseTicketProps = {
 }
 
 export interface IClientProvider {
-  createPurchase(data: ICreateBBPurchaseProps): Promise<IResponseBBPurchaseProps>;
-  createPurchaseTicket(data: ICreateBBPurchaseTicketProps): Promise<string>;
-  searchLastPurchase(): Promise<IPurchase>;
+  CreatePurchase(data: ICreateBBPurchaseProps): Promise<IResponseBBPurchaseProps>;
+  CreatePurchaseTicket(data: ICreateBBPurchaseTicketProps): Promise<string>;
+  SearchLastPurchase(): Promise<IPurchase>;
   // implementar busca de bolelos por intervalo de datas;
   // searchPuschses(): Promise<IResponseBBPurchaseProps[]>;
 }

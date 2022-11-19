@@ -3,7 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.fatorVencimento = fatorVencimento;
+exports.formataNumero = formataNumero;
+exports.formatacaoConvenio7 = formatacaoConvenio7;
 exports.generateBoleto = generateBoleto;
+exports.geraCodigoBanco = geraCodigoBanco;
+exports.modulo11 = modulo11;
+exports.montaLinhaDigitavel = montaLinhaDigitavel;
 var _fs = _interopRequireDefault(require("fs"));
 var _path = _interopRequireDefault(require("path"));
 var _htmlPdf = _interopRequireDefault(require("html-pdf"));

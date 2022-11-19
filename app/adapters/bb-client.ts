@@ -18,7 +18,7 @@ import { CheckBBCreatePurchase } from "../utils/check-bb-create-purchase";
 import { BB_URLS } from "../config/urls";
 import { APP_KEY } from "../config/app-key";
 import { fatorVencimento, formatacaoConvenio7, formataNumero, geraCodigoBanco, modulo11, montaLinhaDigitavel } from "../utils/generate-boleto";
-import { generateLink } from "app/utils/generate-link";
+import { generateLink } from "../utils/generate-link";
 
 export type IBBClientProps = {
   BB_API_KEY: string,
@@ -125,7 +125,7 @@ export class BBClient implements IClientProvider {
    * 
    * @returns IPurchase Boleto
    */
-  async searchLastPurchase(): Promise<IPurchase> {
+  async SearchLastPurchase(): Promise<IPurchase> {
     // set authentication
     const auth = await this.auth();
     const accessToken = auth.data.access_token;
@@ -182,7 +182,7 @@ export class BBClient implements IClientProvider {
    * @param purchaseValue Valor da compra em reais.
    * @returns Objeto do boleto.
    */
-  async createPurchase(data: ICreateBBPurchaseProps): Promise<IResponseBBPurchaseProps> {
+  async CreatePurchase(data: ICreateBBPurchaseProps): Promise<IResponseBBPurchaseProps> {
     // verify params
     CheckBBCreatePurchase(data);
 
@@ -194,7 +194,7 @@ export class BBClient implements IClientProvider {
       if (this.ENVIRONMENT === 'dev') {
         ticket = String(crypto.randomInt(10000, 1000000)).padStart(10, '0');
       } else {
-        const lastPurchase = await this.searchLastPurchase();
+        const lastPurchase = await this.SearchLastPurchase();
         ticket = String(Number(lastPurchase.numeroBoletoBB.substring(10)) + 1).padStart(10, '0'); // increment 1 in for create a new purchase
       }
 
@@ -264,7 +264,12 @@ export class BBClient implements IClientProvider {
     }
   }
 
-  async createPurchaseTicket(data: ICreateBBPurchaseTicketProps): Promise<string> {
+  /**
+   * Método responsável por gerar o modelo em PDF do boleto.
+   * @param data ICreateBBPurchaseTicketProps
+   * @return string Path do arquivo gerado
+   */
+  async CreatePurchaseTicket(data: ICreateBBPurchaseTicketProps): Promise<string> {
     const codigoBanco = '001';
     const numMoeda = '9';
     const valor = data.ticketValue.toLocaleString('pt-br', {
