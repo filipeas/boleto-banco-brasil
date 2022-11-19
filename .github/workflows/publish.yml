@@ -1,8 +1,9 @@
 name: Publicação do pacote - BOLETO_BANCO_BRASIL
 on:
   push:
-        branches: #pull_request
-            - master
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
         # types: [closed]
 jobs:
   build:
