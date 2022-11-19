@@ -57,7 +57,7 @@ CONTA
 CAMPO 4 DA LINHA DIGITÁVEL
 #################################################
 */
-function modulo11(num: string, base = 9, r = 0) {
+export function modulo11(num: string, base = 9, r = 0) {
   let soma = 0;
   let fator = 2;
 
@@ -116,7 +116,7 @@ function modulo11(num: string, base = 9, r = 0) {
   return '';
 }
 
-function geraCodigoBanco(numero: string) {
+export function geraCodigoBanco(numero: string) {
   const parte1 = numero.substr(0, 3);
   const parte2 = modulo11(parte1);
   return `${parte1}-${parte2}`;
@@ -147,7 +147,7 @@ function _dateToDays(year: string, month: string, day: string) {
   );
 }
 
-function fatorVencimento(data: string) {
+export function fatorVencimento(data: string) {
   const newData = data.split('/');
   const ano = newData[2];
   const mes = newData[1];
@@ -159,7 +159,7 @@ function fatorVencimento(data: string) {
 Montagem da linha digitável - Função tirada do PHPBoleto
 Não mudei nada
 */
-function montaLinhaDigitavel(linha: string) {
+export function montaLinhaDigitavel(linha: string) {
   // Posição 	Conteúdo
   // 1 a 3    Número do banco
   // 4        Código da Moeda - 9 para Real
@@ -206,7 +206,7 @@ function montaLinhaDigitavel(linha: string) {
   return `${campo1} ${campo2} ${campo3} ${campo4} ${campo5}`;
 }
 
-function formataNumero(
+export function formataNumero(
   numero: string,
   loop: number,
   insert: number,
@@ -243,7 +243,7 @@ function formataNumero(
 }
 
 // Carteira 18 com Convênio de 7 dígitos
-function formatacaoConvenio7(
+export function formatacaoConvenio7(
   codigobanco: string,
   nummoeda: string,
   fatorvencimento: string,

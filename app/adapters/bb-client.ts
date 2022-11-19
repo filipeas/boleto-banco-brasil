@@ -1,13 +1,24 @@
 import axios, { AxiosError } from "axios";
 import crypto from 'crypto';
+import { addDays } from "date-fns";
+import path from 'path';
+import pdf from 'html-pdf';
+import handlebars from 'handlebars';
+import JSBarcode from 'jsbarcode';
+import { DOMImplementation, XMLSerializer } from 'xmldom';
+import svg64 from 'svg64';
+import fs from 'fs';
 
 import { formatDate } from "../utils/format-date";
 
-import { IClientProvider, ICreateBBPurchaseProps, IPurchase, IResponseBBPurchaseProps, IResponseSearchBBPurchase } from "../providers/client.provider";
-import { addDays } from "date-fns";
+import { IClientProvider, ICreateBBPurchaseProps, ICreateBBPurchaseTicketProps, IPurchase, IResponseBBPurchaseProps, IResponseSearchBBPurchase } from "../providers/client.provider";
 
 import { CheckBBClientProps } from "../utils/check-bb-client-props";
 import { CheckBBCreatePurchase } from "../utils/check-bb-create-purchase";
+import { BB_URLS } from "../config/urls";
+import { APP_KEY } from "../config/app-key";
+import { fatorVencimento, formatacaoConvenio7, formataNumero, geraCodigoBanco, modulo11, montaLinhaDigitavel } from "../utils/generate-boleto";
+import { generateLink } from "app/utils/generate-link";
 
 export type IBBClientProps = {
   BB_API_KEY: string,
@@ -76,19 +87,13 @@ export class BBClient implements IClientProvider {
     this.BB_AGENCIA = BB_AGENCIA;
     this.BB_CONTA = BB_CONTA;
     this.ENVIRONMENT = ENVIRONMENT;
+    this.BB_APP_KEY = APP_KEY;
 
     // verify environment
-    if (this.ENVIRONMENT === 'dev') {
-      this.BB_API_URL = 'https://api.hm.bb.com.br/cobrancas/v2';
-      this.BB_APP_KEY = 'gw-dev-app-key';
-      this.BB_OAUTH_URL = 'https://oauth.sandbox.bb.com.br/oauth/token';
-    } else {
-      this.BB_API_URL = 'https://api.hm.bb.com.br/cobrancas/v2';
-      this.BB_APP_KEY = 'gw-dev-app-key';
-      this.BB_OAUTH_URL = 'https://oauth.sandbox.bb.com.br/oauth/token';
-    }
+    this.BB_API_URL = BB_URLS[ENVIRONMENT].API_URL;
+    this.BB_OAUTH_URL = BB_URLS[ENVIRONMENT].OAUTH_URL;
   }
-
+  
   /**
    * Método responsável por realizar autenticação com a API do Banco do Brasil.
    * 
@@ -257,6 +262,159 @@ export class BBClient implements IClientProvider {
       const message = isAppError ? `Houve um erro na geração do boleto pela API do Banco do Brasil. Err: ${error.response?.data.erros[0].mensagem} - ${error.response?.data.erros[0].ocorrencia}` : 'Não gerar um registro de boleto.'
       throw Error(message);
     }
+  }
+
+  async createPurchaseTicket(data: ICreateBBPurchaseTicketProps): Promise<string> {
+    const codigoBanco = '001';
+    const numMoeda = '9';
+    const valor = data.ticketValue.toLocaleString('pt-br', {
+      minimumFractionDigits: 2,
+    });
+    const dataBoleto = {
+      // nosso_numero: numBoleto,
+      numero_documento: data.purchaseId, // Num do pedido ou do documento
+      data_vencimento: data.dueDate, // Data de Vencimento do Boleto - REGRA: Formato DD/MM/AAAA
+      data_documento: formatDate(new Date(), 'dd/MM/yyyy'), // Data de emissão do Boleto
+      data_processamento: formatDate(new Date(), 'dd/MM/yyyy'), // Data de processamento do boleto (opcional)
+      valor_boleto: valor, // Valor do Boleto - REGRA: Com vírgula e sempre com duas casas depois da virgula
+
+      codigo_barras: data.numericBarcode,
+      // linha_digitavel: linhaDigitavel,
+
+      // DADOS DO SEU CLIENTE
+      sacado: data.customerName,
+      endereco1: data.customerAddress,
+      endereco2: `${data.customerCity} - ${data.customerStateCode} - CEP: ${data.customerZipcode}`,
+
+      // INFORMACOES PARA O CLIENTE
+      demonstrativo1: '',
+      demonstrativo2: '',
+      demonstrativo3: '',
+
+      // INSTRUÇÕES PARA O CAIXA
+      instrucoes1: '- Sr. Caixa, não receber após o vencimento',
+      instrucoes2: '',
+      instrucoes3: '',
+      instrucoes4: '',
+
+      // DADOS OPCIONAIS DE ACORDO COM O BANCO OU CLIENTE
+      quantidade: '',
+      valor_unitario: '',
+      aceite: 'N',
+      especie: 'R$',
+      especie_doc: 'DM',
+
+      // ---------------------- DADOS FIXOS DE CONFIGURAÇÃO DO SEU BOLETO --------------- //
+
+      // DADOS DA SUA CONTA - BANCO DO BRASIL
+      agencia: this.BB_AGENCIA, // Num da agencia, sem digito
+      conta: this.BB_CONTA, // Num da conta, sem digito
+
+      // DADOS PERSONALIZADOS - BANCO DO BRASIL
+      convenio: this.BB_CONVENIO, // Num do convênio - REGRA: 6 ou 7 ou 8 dígitos
+      contrato: '999999', // Num do seu contrato
+      carteira: this.BB_WALLET,
+      variacao_carteira: '', // Variação da Carteira, com traço (opcional)
+
+      // TIPO DO BOLETO
+      formatacao_convenio: '7', // REGRA: 8 p/ Convênio c/ 8 dígitos, 7 p/ Convênio c/ 7 dígitos, ou 6 se Convênio c/ 6 dígitos
+      formatacao_nosso_numero: '2', // REGRA: Usado apenas p/ Convênio c/ 6 dígitos: informe 1 se for NossoNúmero de até 5 dígitos ou 2 para opção de até 17 dígitos
+
+      // SEUS DADOS
+      identificacao: '',
+      cpf_cnpj: '32.063.701/0001-66',
+      endereco: '',
+      cidade_uf: 'Teresina / PI',
+      cedente: 'M & F COMERCIO DE LIVROS E ALIMENTOS LTDA',
+
+      linha_digitavel: montaLinhaDigitavel(data.numericBarcode),
+      agencia_codigo: `${this.BB_AGENCIA}-${modulo11(this.BB_AGENCIA)} / ${this.BB_CONTA}-${modulo11(
+        this.BB_CONTA,
+      )}`,
+      nosso_numero: formatacaoConvenio7(
+        codigoBanco,
+        numMoeda,
+        String(fatorVencimento(data.dueDate)),
+        formataNumero(String(valor), 10, 0, 'valor'),
+        '000000',
+        this.BB_CONVENIO,
+        data.purchaseId,
+        this.BB_WALLET,
+      ),
+      codigo_banco_com_dv: geraCodigoBanco(codigoBanco),
+    };
+
+    const templatePath = path.resolve(
+      __dirname,
+      '..',
+      'views',
+      'banco-do-brasil',
+      'boleto.hbs',
+    );
+
+    // gerando barcode
+    const xmlSerializer = new XMLSerializer();
+    const document = new DOMImplementation().createDocument(
+      'http://www.w3.org/1999/xhtml',
+      'html',
+      null,
+    );
+    const svgNode = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+    JSBarcode(svgNode, dataBoleto.linha_digitavel, {
+      xmlDocument: document,
+      height: 50,
+      width: 1,
+      displayValue: false,
+    });
+
+    const svgText = xmlSerializer.serializeToString(svgNode);
+
+    const b64 = svg64(svgText);
+
+    // read logo banco do brasil
+    const logoPath = path.resolve(
+      __dirname,
+      '..',
+      'public',
+      'images',
+      'logobb.jpg',
+    );
+    const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
+
+    const templateHtml = fs.readFileSync(templatePath).toString('utf-8');
+    const templateHTML = handlebars.compile(templateHtml);
+    const html = templateHTML({ dataBoleto, barcode: b64, logobb: logoBase64 });
+    // const html = templateHTML({ data, images });
+
+    const pdfRootPath = path.resolve(
+      process.cwd(),
+      'tmp',
+      'uploads',
+      'boletos',
+    );
+
+    if (!fs.existsSync(pdfRootPath)) {
+      fs.mkdirSync(pdfRootPath, { recursive: true });
+    }
+
+    const milis = new Date().getTime();
+    const pdfPath = path.join(pdfRootPath, `boleto-${milis}.pdf`);
+
+    pdf
+      .create(html, {
+        format: 'A4',
+        // width: '22cm',
+        // height: '29.7cm',
+      })
+      .toFile(pdfPath, (err, fileData) => {
+        console.log(`Salvando PDF.`);
+        if (err) return console.log(err);
+        console.log('Pdf generated.');
+        return fileData;
+      });
+
+    return generateLink('boletos', `boleto-${milis}.pdf`);
   }
 
   getENVIRONMENT() {

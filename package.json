@@ -2,7 +2,7 @@
   "name": "boleto-banco-brasil",
   "version": "0.0.7",
   "description": "SDK para boletos do Banco do Brasil",
-  "main": "dist/core/client.js",
+  "main": "dist/core/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/filipeas/boleto-banco-brasil.git"

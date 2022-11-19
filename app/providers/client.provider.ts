@@ -62,7 +62,23 @@ export type IResponseSearchBBPurchase = {
   boletos: IPurchase[];
 };
 
+
+export type ICreateBBPurchaseTicketProps = {
+  numericBarcode: string;
+  ticketValue: number;
+  purchaseId: string;
+  dueDate: string;
+  customerName: string;
+  customerZipcode: string;
+  customerAddress: string;
+  customerCity: string;
+  customerStateCode: string;
+}
+
 export interface IClientProvider {
   createPurchase(data: ICreateBBPurchaseProps): Promise<IResponseBBPurchaseProps>;
+  createPurchaseTicket(data: ICreateBBPurchaseTicketProps): Promise<string>;
   searchLastPurchase(): Promise<IPurchase>;
+  // implementar busca de bolelos por intervalo de datas;
+  // searchPuschses(): Promise<IResponseBBPurchaseProps[]>;
 }
