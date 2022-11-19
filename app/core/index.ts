@@ -1,0 +1,1 @@
+export { BBClient, IBBClientProps } from '../adapters/bb-client';

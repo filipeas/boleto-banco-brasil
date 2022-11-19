@@ -1,13 +1,17 @@
 {
   "name": "boleto-banco-brasil",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "SDK para boletos do Banco do Brasil",
-  "main": "dist/index.js",
+  "main": "dist/core/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/filipeas/boleto-banco-brasil.git"
   },
   "author": "filipe a.s <felipealvessampaio@hotmail.com>",
+  "contributors": [
+    "RennanD <https://github.com/RennanD>",
+    "filipe a.s <felipealvessampaio@hotmail.com>"
+  ],
   "license": "MIT",
   "keywords": [
     "banco-do-brasil",
@@ -17,10 +21,11 @@
     "typescript"
   ],
   "scripts": {
-    "build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
+    "build": "babel app --extensions \".js,.ts\" --out-dir dist --copy-files",
     "start:dev": "tsnd -r tsconfig-paths/register --exit-child --poll --inspect --ignore-watch node_modules --transpile-only --respawn src/infra/http/server.ts",
     "commit": "git-cz",
-    "test": "jest"
+    "test": "jest",
+    "bb:purchase": "tsnd --exit-child --transpile-only --ignore-watch node_modules app/core/create-purchase.ts"
   },
   "devDependencies": {
     "@babel/cli": "^7.18.6",
@@ -67,7 +72,6 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "cors": "^2.8.5",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
     "express": "^4.18.1",
@@ -75,7 +79,6 @@
     "handlebars": "^4.7.7",
     "html-pdf": "^2.0.0",
     "jsbarcode": "^3.11.5",
-    "nodemailer": "^6.7.5",
     "reflect-metadata": "^0.1.13",
     "svg64": "^1.2.0",
     "tsyringe": "^4.6.0",
